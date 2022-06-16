@@ -97,8 +97,12 @@ function req(varObj, ACT) {
     }).then(function(e) {
         if (varObj.totalPage == -1) {
             switch (varObj.apiSign) {
+                case 'StoreMyUsers2':
                 case 'StoreMyUsers':
                     varObj.totalPage = Math.ceil(e.count / varObj.dataObject.limit);
+                    break;
+                case 'user/cash':
+                    varObj.totalPage = Math.ceil(e.total / varObj.dataObject.limit);
                     break;
                 default:
                     varObj.totalPage = e.totalPage;
@@ -111,30 +115,66 @@ function req(varObj, ACT) {
         var content = new Array();
         listObj = e.list;
         if (listObj.length > 0) {
+            var isHeader = false;
             listObj.forEach(function(el, idx) {
+                var fields = new Array();
                 let contentC = new Array();
                 switch (varObj.apiSign) {
                     case 'withdraw':
-                        contentC.push("\"" + el.userName + "\"");
-                        contentC.push("\"" + el.userPayName + "\"");
-                        contentC.push("\"" + el.userPayAccount + "\"");
-                        contentC.push("\"" + el.mobile + "\"");
-                        contentC.push("\"" + el.feeTotal + "\"");
+                        fields = ['userName', 'userPayName', 'userPayAccount', 'mobile', 'feeTotal'];
                         break;
+                    case 'StoreMyUsers2':
                     case 'StoreMyUsers':
-                        contentC.push("\"`" + el.userId + "\"");
-                        contentC.push("\"" + el.name + "\"");
-                        contentC.push("\"" + el.mobile + "\"");
-                        // 直接获取邀请的人员
-                        // window["a1_"+el.userId]={apiSign:"getInvitedUserAndBetData",apiUrl:"user/store/userInvited",pageNo:1,totalPage:-1,sIc:null,apiSignKey:el.userId};
-                        // window["a1_"+el.userId].dataObject={ page: 1, pageSize: 500,userId:el.userId,startTime:'', endTime:''};
-                        // window["a1_"+el.userId].sIc=setInterval(req, 5000,window["a1_"+el.userId],'post');
+                        fields = ['userId', 'name', 'mobile'];
+                        if ('StoreMyUsers' == varObj.apiSign) {
+                            // 直接获取邀请的人员
+                            // window["a1_"+el.userId]={apiSign:"getInvitedUserAndBetData",apiUrl:"user/store/userInvited",pageNo:1,totalPage:-1,sIc:null,apiSignKey:el.userId};
+                            // window["a1_"+el.userId].dataObject={ page: 1, pageSize: 500,userId:el.userId,startTime:'', endTime:''};
+                            // window["a1_"+el.userId].sIc=setInterval(req, 5000,window["a1_"+el.userId],'post');
+                        } else if ('StoreMyUsers2' == varObj.apiSign) {
+                            var startDate = window.prompt("请输出需要查询的开始的日期时间", "2022-06-01 16:43");
+                            var endDate = window.prompt("请输出需要查询的结束的日期时间", "2022-06-14 16:43");
+                            if (startDate != '') {
+                                startDate = (new Date(startDate)).getTime() / 1000;
+                            } else {
+                                startDate = 0;
+                            }
+                            if (endDate != '') {
+                                endDate = (new Date(endDate)).getTime() / 1000;
+                            } else {
+                                endDate = 0;
+                            }
+                            window["a2_" + el.userId] = { apiSign: "user/cash", apiUrl: "store/coin/tradeLog/user/cash", pageNo: 1, totalPage: -1, sIc: null, apiSignKey: el.userId };
+                            window["a2_" + el.userId].dataObject = {
+                                currencyTag: '',
+                                endDate: endDate,
+                                limit: 500,
+                                page: 1,
+                                startDate: startDate,
+                                tradeCode: '', // 分类
+                                userId: el.userId
+                            };
+                            window["a2_" + el.userId].sIc = setInterval(req, 5000, window["a2_" + el.userId], 'get');
+                        }
                         break;
                     default:
-                        for (const objkey in el) { contentC.push("\"" + el[objkey] + "\""); }
+                        for (const objkey in el) {
+                            fields.push(objkey);
+                        }
                         break;
                 }
-                content.push(contentC.join(","));
+                if (!isHeader) {
+                    content.push(fields.join(","));
+                    isHeader = true;
+                }
+                if (fields.length > 0) {
+                    fields.forEach(function(el2, idx2) {
+                        if (el[el2] != undefined) {
+                            contentC.push("\"" + el[el2] + "\"");
+                        }
+                    });
+                    content.push(contentC.join(","));
+                }
             });
             let fnPath = 'dealMoney-' + varObj.apiSign + (varObj.apiSignKey != undefined ? '-(' + varObj.apiSignKey + ')' : '') + '-' + (new Date()).getDate() + '-' + varObj.pageNo + '.csv';
             console.save(content.join("\n"), fnPath);
@@ -170,3 +210,10 @@ a1.sIc = setInterval(req, 5000, a1);
 var a2 = { apiSign: "StoreMyUsers", apiUrl: "store/my/users", pageNo: 1, totalPage: -1, sIc: null };
 a2.dataObject = { searchKey: "", page: a2.pageNo, limit: 500, sortType: 0 };
 a2.sIc = setInterval(req, 5000, a2);
+
+// 2.3 我的,用户管理,按查询
+// https://store.youdianshop.com/punters/search
+var searchKey = window.prompt("请输出需要查询的手机号,可以末尾几位", "32494");
+var a3 = { apiSign: "StoreMyUsers2", apiUrl: "store/my/users", pageNo: 1, totalPage: -1, sIc: null };
+a3.dataObject = { searchKey: searchKey, page: a3.pageNo, limit: 500, sortType: 0 };
+a3.sIc = setInterval(req, 5000, a3);
