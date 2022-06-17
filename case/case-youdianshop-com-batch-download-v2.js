@@ -1,7 +1,7 @@
 /*
  * @Author: ChinaBUG
  * @Date: 2022-06-08 16:08:08
- * @LastEditTime: 2022-06-08 16:15:39
+ * @LastEditTime: 2022-06-17 14:22:35
  * @LastEditors: pptogo-110
  * @Description: 某个应用的后台，批量下载用户数据
  * @FilePath: \js-utils\case\case-youdianshop-com-batch-download.js
@@ -119,18 +119,10 @@ function req(varObj, ACT) {
                 switch (varObj.apiSign) {
                     case 'withdraw':
                         fields = ['userName', 'userPayName', 'userPayAccount', 'mobile', 'feeTotal'];
-                        // contentC.push("\"" + el.userName + "\"");
-                        // contentC.push("\"" + el.userPayName + "\"");
-                        // contentC.push("\"" + el.userPayAccount + "\"");
-                        // contentC.push("\"" + el.mobile + "\"");
-                        // contentC.push("\"" + el.feeTotal + "\"");
                         break;
                     case 'StoreMyUsers2':
                     case 'StoreMyUsers':
                         fields = ['userId', 'name', 'mobile'];
-                        // contentC.push("\"`" + el.userId + "\"");
-                        // contentC.push("\"" + el.name + "\"");
-                        // contentC.push("\"" + el.mobile + "\"");
                         if ('StoreMyUsers' == varObj.apiSign) {
                             // 直接获取邀请的人员
                             // window["a1_"+el.userId]={apiSign:"getInvitedUserAndBetData",apiUrl:"user/store/userInvited",pageNo:1,totalPage:-1,sIc:null,apiSignKey:el.userId};
@@ -171,24 +163,20 @@ function req(varObj, ACT) {
                 if (!isHeader) {
                     content.push(fields.join(","));
                     isHeader = true;
-                    console.logCSS("fields:" + fields);
                 }
                 if (fields.length > 0) {
-                    console.logCSS("fields.length:" + fields.length);
-                    // console.logCSS("el:" + el);
-                    console.log("el:%o", el);
                     fields.forEach(function(el2, idx2) {
-                        console.log("el[f]:", el2, idx2);
                         if (el[el2] != undefined) {
                             contentC.push("\"" + el[el2] + "\"");
-                            console.logCSS("el:" + el[el2]);
                         }
                     });
                     content.push(contentC.join(","));
                 }
             });
-            let fnPath = 'dealMoney-' + varObj.apiSign + (varObj.apiSignKey != undefined ? '-(' + varObj.apiSignKey + ')' : '') + '-' + (new Date()).getDate() + '-' + varObj.pageNo + '.csv';
-            console.save(content.join("\n"), fnPath);
+            let fnPath = (new Date().getTime()) + '-' + varObj.apiSign + (varObj.apiSignKey != undefined ? '-(' + varObj.apiSignKey + ')' : '') + '-' + (new Date()).getDate() + '-' + varObj.pageNo + '.csv';
+            if (varObj.isDownload == undefined || varObj.isDownload == true) {
+                console.save(content.join("\n"), fnPath);
+            }
             console.logCSS("【" + varObj.apiSign + "】 第 " + varObj.pageNo + " 页 文件保存成功...", "success");
         } else {
             console.logCSS("【" + varObj.apiSign + "】 第 " + varObj.pageNo + " 页 内容为空...", "error");
@@ -226,7 +214,7 @@ function autodownload_3() {
     // 我的,用户管理,按查询
     // https://store.youdianshop.com/punters/search
     var searchKey = window.prompt("请输出需要查询的手机号,可以末尾几位", "32494");
-    var a3 = { apiSign: "StoreMyUsers2", apiUrl: "store/my/users", pageNo: 1, totalPage: -1, sIc: null };
+    var a3 = { apiSign: "StoreMyUsers2", apiUrl: "store/my/users", pageNo: 1, totalPage: -1, sIc: null, isDownload: false };
     a3.dataObject = { searchKey: searchKey, page: a3.pageNo, limit: 500, sortType: 0 };
     a3.sIc = setInterval(req, 5000, a3);
 }
