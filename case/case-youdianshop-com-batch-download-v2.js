@@ -55,7 +55,6 @@
             console.log("%c" + logs, css);
         }
     }
-    console.logCSS("Sdev-JS UTILS v22.06.19.08.56", 'main');
 })(console);
 
 function req(varObj, ACT) {
@@ -223,11 +222,12 @@ function autodownload_3() {
 }
 
 (function() {
+    var de=new Date(),version='V '+de.getYear()+'.'+(de.getMonth()+1)+'.'+de.getDate()+'.'+de.getHours()+'.'+de.getMinutes();
     var w = window,
         d = w.document,
         b = d.body,
         s = d.createElement("div");
-    s.innerHTML = `<select onchange="this.selectedIndex!='0'?window['autodownload_'+this.selectedIndex]():false;" style="width: 94%;padding: 13px;font-size: 30px;"><option value="0">请选择需要的模块</option><option value="1">我的,资金代办,提现,已处理</option><option value="2">我的,用户管理</option><option value="2">我的,用户管理,按查询</option></select>`;
+    s.innerHTML = `<div>${version}</div><select onchange="this.selectedIndex!='0'?window['autodownload_'+this.selectedIndex]():false;" style="width: 94%;padding: 13px;font-size: 30px;"><option value="0">请选择需要的模块</option><option value="1">我的,资金代办,提现,已处理</option><option value="2">我的,用户管理</option><option value="2">我的,用户管理,按查询</option></select>`;
     s.id = 'autodownload';
     s.style = "position: fixed;width: 100%;height: 100%;min-width: 100px;background-color: #c1ff9eb5;top: 0;left: 0;padding: 15px;min-height: 100px;";
     b.appendChild(s);
