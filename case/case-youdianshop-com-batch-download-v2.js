@@ -133,13 +133,13 @@ function req(varObj, ACT) {
                             var endDate = window.prompt("请输出需要查询的结束的日期时间(清空则默认)", "2022-06-14 16:43");
                             if (startDate != '') {
                                 startDate = (new Date(startDate)).getTime() / 1000;
-                                cosnole.log('开始时间：',startDate,new Date(startDate*1000));
+                                console.log('开始时间：',startDate,new Date(startDate*1000));
                             } else {
                                 startDate = 0;
                             }
                             if (endDate != '') {
                                 endDate = (new Date(endDate)).getTime() / 1000;
-                                cosnole.log('结束时间：',endDate,new Date(endDate*1000));
+                                console.log('结束时间：',endDate,new Date(endDate*1000));
                             } else {
                                 endDate = 0;
                             }
