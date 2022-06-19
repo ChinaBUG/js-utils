@@ -55,6 +55,7 @@
             console.log("%c" + logs, css);
         }
     }
+    console.logCSS("Sdev-JS UTILS v22.06.19.08.56", 'main');
 })(console);
 
 function req(varObj, ACT) {
